@@ -1,0 +1,10 @@
+ENV=local
+
+DB_HOST=localhost
+DB_USER=xxx
+DB_PASSWORD=xxx
+DB_NAME=xxx
+DB_PORT=xxx
+DB_TIMEOUT=xxx
+
+JWT_SECRET=xxx
