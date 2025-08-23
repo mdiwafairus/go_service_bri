@@ -1,12 +1,31 @@
-Go Version : go1.24.2
-FIber Version : v2.x
+# Go Fiber Service - BRI
 
-Database menggunakan postgreSql (GORM).
+Project ini adalah service API menggunakan [Go Fiber](https://gofiber.io/), GORM, JWT Authentication, Zerolog Logging, dan Rate Limiting.
 
-Logging dibuat secara global di level database query (GORM) dan aplikasi secara global dengan file zerolog_gorm.go & zerolog.go
-- log error kedalam file error.log
-- log info & warn kedalam file app.log
+---
 
-handling database up/down di level middleware, route untuk cek database "healthcare"
+## 🚀 Fitur
+- Fiber v2 sebagai web framework
+- GORM untuk ORM
+- Middleware:
+  - Rate Limiting
+  - JWT Authentication
+  - Logging dengan Zerolog
+- PostgreSQL
 
-rate limit di level middleware 
+---
+
+## 🛠️ Prasyarat
+Pastikan sudah menginstal:
+- [Go](https://go.dev/dl/) v1.20 atau lebih baru
+- [Git](https://git-scm.com/)
+- [Database](PostgreSQL)
+- [Postman](https://www.postman.com/) (opsional untuk uji API)
+
+---
+
+## 📥 Setup Project
+
+1. clone repository
+2. go mod tidy
+3. create .env

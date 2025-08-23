@@ -32,7 +32,8 @@ func main() {
 	// global rate limiter
 	app.Use(middlewares.RateLimiter())
 
-	app.Get("/healthcare", func(c *fiber.Ctx) error {
+	// check connection database
+	app.Get("/healthcheck", func(c *fiber.Ctx) error {
 		ctx, cancel := context.WithTimeout(c.Context(), 1*time.Second)
 		defer cancel()
 
