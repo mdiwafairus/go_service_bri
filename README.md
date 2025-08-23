@@ -1,5 +1,7 @@
+Go Version : go1.24.2
+FIber Version : v2.x
+
 Database menggunakan postgreSql (GORM).
-Framework menggunakan Fiber .
 
 Logging dibuat secara global di level database query (GORM) dan aplikasi secara global dengan file zerolog_gorm.go & zerolog.go
 - log error kedalam file error.log
