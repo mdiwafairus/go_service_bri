@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"go-fiber-api/constants"
 	"go-fiber-api/dto"
 	"go-fiber-api/services"
@@ -18,7 +17,7 @@ func GetNikExistsHandler(service *services.AllocationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		var req NikMidRequest
-		fmt.Println(req)
+
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"code":    "400",
