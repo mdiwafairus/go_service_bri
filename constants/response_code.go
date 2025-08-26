@@ -12,6 +12,6 @@ const (
 	MsgSuccess         = "Success"
 	MsgNikNotFound     = "NIK not found"
 	MsgBlackoutArea    = "Blackout area"
-	MsgStandUnsuitable = "Stand is unsuitable"
+	MsgStandUnsuitable = "Kios Tidak Sesuai"
 	MsgGeneralError    = "General Error"
 )

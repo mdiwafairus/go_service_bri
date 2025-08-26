@@ -15,10 +15,23 @@ func NewAllocationRepository(db *gorm.DB) *AllocationRepository {
 	return &AllocationRepository{db: db}
 }
 
-func (r *AllocationRepository) GetRetailerByMid(mid int) (models.Retailer, error) {
+func (r *AllocationRepository) GetRetailerByMid(mid string) (models.Retailer, error) {
 	var retailer models.Retailer
 	result := r.db.Unscoped().Where("retailer_mid = ? AND is_active = ?", mid, 1).First(&retailer)
 	return retailer, result.Error
+}
+
+func (r *AllocationRepository) GetRetailersByNik(nik string) ([]models.Retailer, error) {
+	var retailers []models.Retailer
+	result := r.db.
+		Table("psp_wallets as pw").
+		Select("rt.id, rt.retailer_mid, rt.name").
+		Joins("JOIN retailers rt ON rt.id = pw.retailer_id").
+		Where("pw.farmer_nik = ? AND rt.is_active = ?", nik, 1).
+		Group("rt.id, rt.retailer_mid, rt.name").
+		Find(&retailers)
+
+	return retailers, result.Error
 }
 
 func (r *AllocationRepository) CheckNikExists(nik string) ([]dto.NikExistsResponse, error) {

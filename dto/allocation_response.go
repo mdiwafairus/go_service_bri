@@ -25,3 +25,15 @@ type KuotaResponse struct {
 	KelompokTani []string     `json:"kelompok_tani"`
 	KuotaPupuk   []KuotaPupuk `json:"kuota_pupuk"`
 }
+
+type KiosTidakSesuaiResponse struct {
+	Code    string        `json:"code"`
+	Message string        `json:"message"`
+	Suggest []SuggestKios `json:"suggest,omitempty"`
+}
+
+// Struktur untuk suggest kios
+type SuggestKios struct {
+	Mid  string `json:"mid"`
+	Name string `json:"retailer_name"`
+}

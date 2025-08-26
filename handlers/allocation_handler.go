@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"go-fiber-api/constants"
+	"go-fiber-api/dto"
 	"go-fiber-api/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -16,7 +18,7 @@ func GetNikExistsHandler(service *services.AllocationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		var req NikMidRequest
-
+		fmt.Println(req)
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"code":    "400",
@@ -33,10 +35,24 @@ func GetNikExistsHandler(service *services.AllocationService) fiber.Handler {
 
 		response, err := service.GetNikExistsResponse(req.Nik, req.Mid)
 		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"code":    constants.StatusNikNotFound,
-				"message": err.Error(),
-			})
+			switch e := err.(type) {
+			case *services.NikNotFoundError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusNikNotFound,
+					"message": constants.MsgNikNotFound,
+				})
+			case *services.KiosNotMatchError:
+				return c.JSON(dto.KiosTidakSesuaiResponse{
+					Code:    constants.StatusStandUnsuitable,
+					Message: constants.MsgStandUnsuitable,
+					Suggest: e.Suggest,
+				})
+			default:
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"code":    "500",
+					"message": err.Error(),
+				})
+			}
 		}
 
 		return c.JSON(fiber.Map{

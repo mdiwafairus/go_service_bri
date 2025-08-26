@@ -1,8 +1,6 @@
 package services
 
 import (
-	"errors"
-	"go-fiber-api/constants"
 	"go-fiber-api/dto"
 	"go-fiber-api/repositories"
 )
@@ -22,7 +20,22 @@ func (s *AllocationService) GetNikExistsResponse(nik, mid string) (dto.KuotaResp
 	}
 
 	if len(wallets) == 0 {
-		return dto.KuotaResponse{}, errors.New(constants.MsgNikNotFound)
+		return dto.KuotaResponse{}, &NikNotFoundError{}
+	}
+
+	retailer, err := s.repo.GetRetailerByMid(mid)
+	if err != nil || retailer.RetailerMid == "" {
+		retailers, _ := s.repo.GetRetailersByNik(nik)
+
+		var suggestKios []dto.SuggestKios
+		for _, r := range retailers {
+			suggestKios = append(suggestKios, dto.SuggestKios{
+				Mid:  r.RetailerMid,
+				Name: r.Name,
+			})
+		}
+
+		return dto.KuotaResponse{}, &KiosNotMatchError{Suggest: suggestKios}
 	}
 
 	var totalUrea, totalZA, totalSP36, totalNPK, totalOrganic float64
@@ -48,7 +61,7 @@ func (s *AllocationService) GetNikExistsResponse(nik, mid string) (dto.KuotaResp
 	}
 
 	response := dto.KuotaResponse{
-		Mid:          mid,
+		Mid:          wallets[0].RetailerMid,
 		FarmerName:   wallets[0].FarmerName,
 		Namakios:     wallets[0].RetailerName,
 		KelompokTani: kelompokTani,
