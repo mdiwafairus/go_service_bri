@@ -52,6 +52,7 @@ func main() {
 	app.Post("/login", handlers.Login)
 
 	routes.UserRoutes(app)
+	routes.AllocationRoutes(app)
 
 	err := app.Listen(":3000")
 	if err != nil {
