@@ -45,3 +45,12 @@ func (r *AllocationRepository) CheckNikExists(nik string) ([]dto.NikExistsRespon
 
 	return wallets, result.Error
 }
+
+func (r *AllocationRepository) CheckNikExistsWallet(nik, komoditas string) (models.PspWallet, error) {
+	var wallets models.PspWallet
+	result := r.db.Select(`farmer_nik, retailer_id, farmer_name`).
+		Where("farmer_nik = ? AND komoditas = ? AND is_active = ?", nik, komoditas, 1).
+		First(&wallets)
+
+	return wallets, result.Error
+}

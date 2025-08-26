@@ -1,17 +1,22 @@
 package constants
 
 const (
-	StatusSuccess         = "00"
-	StatusNikNotFound     = "21"
-	StatusStandUnsuitable = "22"
-	StatusBlackoutArea    = "33"
-	StatusGeneralError    = "99"
+	StatusSuccess                  = "00"
+	StatusNikNotFound              = "21"
+	StatusStandUnsuitable          = "22"
+	StatusPupukKomoditasTidakValid = "33"
+	StatusGeneralError             = "99"
+	StatusAlokasiNotFound          = "31"
+	StatusTidakMemilikiKuota       = "32"
 )
 
 const (
-	MsgSuccess         = "Success"
-	MsgNikNotFound     = "NIK not found"
-	MsgBlackoutArea    = "Blackout area"
-	MsgStandUnsuitable = "Kios Tidak Sesuai"
-	MsgGeneralError    = "General Error"
+	MsgSuccess                  = "Success"
+	MsgNikNotFound              = "NIK not found"
+	MsgBlackoutArea             = "Blackout area"
+	MsgStandUnsuitable          = "Kios Tidak Sesuai"
+	MsgGeneralError             = "General Error"
+	MsgPupukKomoditasTidakValid = "Jenis pupuk atau komoditi tidak valid"
+	MsgAlokasiNotFound          = "Alokasi Tidak Ditemukan"
+	MsgTidakMemilikiKuota       = "Tidak memiliki kuota atau kuota tidak cukup"
 )

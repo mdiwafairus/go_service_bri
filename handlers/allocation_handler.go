@@ -13,7 +13,7 @@ type NikMidRequest struct {
 	Nik string `json:"nik"`
 }
 
-func GetNikExistsHandler(service *services.AllocationService) fiber.Handler {
+func QuotaHandler(service *services.AllocationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
 		var req NikMidRequest

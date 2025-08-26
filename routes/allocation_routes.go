@@ -16,5 +16,5 @@ func AllocationRoutes(app *fiber.App) {
 	allocationRepo := repositories.NewAllocationRepository(config.DB)
 	allocationService := services.NewAllocationService(allocationRepo)
 
-	allocation.Get("/quota", handlers.GetNikExistsHandler(allocationService))
+	allocation.Get("/quota", handlers.QuotaHandler(allocationService))
 }
