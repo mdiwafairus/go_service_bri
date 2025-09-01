@@ -10,6 +10,11 @@ import (
 
 var secretKey = []byte(os.Getenv("JWT_SECRET"))
 
+type TokenPair struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 func GenerateJWT(userID uint) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,

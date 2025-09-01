@@ -70,3 +70,7 @@ func (s *AllocationService) GetNikExistsResponse(nik, mid string) (dto.KuotaResp
 
 	return response, nil
 }
+
+func (s *AllocationService) InquiryServiceResponse(nik string, mid int) (dto.InquiryResponse, error) {
+	return dto.InquiryResponse{}, nil
+}

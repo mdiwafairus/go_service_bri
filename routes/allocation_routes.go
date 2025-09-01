@@ -11,10 +11,13 @@ import (
 )
 
 func AllocationRoutes(app *fiber.App) {
-	allocation := app.Group("/allocation", middlewares.JWTProtected())
+	v1 := app.Group("/api/v1")
+
+	allocation := v1.Group("/allocation", middlewares.JWTProtected())
 
 	allocationRepo := repositories.NewAllocationRepository(config.DB)
 	allocationService := services.NewAllocationService(allocationRepo)
 
 	allocation.Get("/quota", handlers.QuotaHandler(allocationService))
+	allocation.Get("/inquiry", handlers.InquiryHandler(allocationService))
 }

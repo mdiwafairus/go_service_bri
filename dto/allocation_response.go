@@ -32,8 +32,20 @@ type KiosTidakSesuaiResponse struct {
 	Suggest []SuggestKios `json:"suggest,omitempty"`
 }
 
-// Struktur untuk suggest kios
 type SuggestKios struct {
 	Mid  string `json:"mid"`
 	Name string `json:"retailer_name"`
+}
+
+type InquiryResponse struct {
+	NamaPetani    string `json:"nama_petani"`
+	NamaKios      string `json:"nama_kios"`
+	KelompokTani  string `json:"kelompok_tani"`
+	NamaPupuk     string `json:"nama_pupuk"`
+	NamaKomoditas string `json:"nama_komoditas"`
+	KgBeli        string `json:"kg_beli"`
+	Harga         string `json:"harga"`
+	KuotaSisa     string `json:"kuota_sisa"`
+	KodeDesa      string `json:"kode_desa"`
+	TotalBeli     string `json:"total_beli"`
 }

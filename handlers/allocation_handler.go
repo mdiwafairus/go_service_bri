@@ -8,15 +8,23 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type NikMidRequest struct {
+type QuotaRequest struct {
 	Mid string `json:"mid"`
 	Nik string `json:"nik"`
+}
+
+type InquiryRequest struct {
+	Mid           string `json:"mid"`
+	Nik           string `json:"nik"`
+	NamaPupuk     string `json:"nama_pupuk"`
+	NamaKomoditas string `json:"nama_komoditas"`
+	KgBeli        int    `json:"kg_beli"`
 }
 
 func QuotaHandler(service *services.AllocationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 
-		var req NikMidRequest
+		var req QuotaRequest
 
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -54,6 +62,31 @@ func QuotaHandler(service *services.AllocationService) fiber.Handler {
 			}
 		}
 
+		return c.JSON(fiber.Map{
+			"responseCode":    constants.StatusSuccess,
+			"responseMessage": constants.MsgSuccess,
+			"data":            response,
+		})
+	}
+}
+
+func InquiryHandler(service *services.AllocationService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		var req InquiryRequest
+
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    "400",
+				"message": "Invalid request body",
+			})
+		}
+
+		// if !helpers.KomoditasMap[komoditasParam] || !helpers.JenisPupukMap[namaPupuk] {
+		// 	return helpers.ResponseError(c, "33", "Jenis pupuk atau komoditi tidak valid")
+		// }
+
+		response := "<response>"
 		return c.JSON(fiber.Map{
 			"responseCode":    constants.StatusSuccess,
 			"responseMessage": constants.MsgSuccess,
