@@ -21,6 +21,15 @@ func (r *AllocationRepository) GetRetailerByMid(mid string) (models.Retailer, er
 	return retailer, result.Error
 }
 
+func (r *AllocationRepository) GetRetailerByMidInquiry(mid string) ([]models.Retailer, error) {
+	var retailers []models.Retailer
+	err := r.db.Where("retailer_mid = ? AND is_active = 1", mid).Find(&retailers).Error
+	if err != nil {
+		return nil, err
+	}
+	return retailers, nil
+}
+
 func (r *AllocationRepository) GetRetailersByNik(nik string) ([]models.Retailer, error) {
 	var retailers []models.Retailer
 	result := r.db.
@@ -65,4 +74,36 @@ func (r *AllocationRepository) CheckAllocationNotFound(nik string) ([]dto.NikExi
 		Find(&wallets)
 
 	return wallets, result.Error
+}
+
+func (r *AllocationRepository) CheckAlokasiPetani(nik, komoditas string, retailerID []int) (*dto.NikExistsResponse, error) {
+	var wallet dto.NikExistsResponse
+
+	query := r.db.Table("psp_wallet AS w").
+		Select(`
+			w.farmer_nik,
+			w.farmer_name,
+			w.sub_district_code AS sub_district_code,
+			STRING_AGG(DISTINCT w.farmer_group_name, ', ') AS farmer_group_name,
+			STRING_AGG(DISTINCT rt.name, ', ') AS retailer_name,
+			SUM(w.urea) AS urea,
+			SUM(w.npk) AS npk,
+			SUM(w.npk_formula) AS npk_formula,
+			SUM(w.sp36) AS sp36,
+			SUM(w.za) AS za,
+			SUM(w.organic) AS organic,
+			SUM(w.poc) AS poc
+		`).
+		Joins("JOIN retailers AS rt ON rt.id = w.retailer_id").
+		Where("w.farmer_nik = ?", nik).
+		Where("UPPER(w.komoditas) = ?", komoditas).
+		Where("w.retailer_id IN ?", retailerID).
+		Where("w.is_active = ?", 1).
+		Group("w.farmer_nik, w.farmer_name, w.sub_district_code").
+		Limit(1)
+
+	if err := query.Scan(&wallet).Error; err != nil {
+		return nil, err
+	}
+	return &wallet, nil
 }

@@ -2,7 +2,9 @@ package services
 
 import (
 	"go-fiber-api/dto"
+	"go-fiber-api/helpers"
 	"go-fiber-api/repositories"
+	"strconv"
 )
 
 type AllocationService struct {
@@ -13,7 +15,7 @@ func NewAllocationService(repo *repositories.AllocationRepository) *AllocationSe
 	return &AllocationService{repo: repo}
 }
 
-func (s *AllocationService) GetNikExistsResponse(nik, mid string) (dto.KuotaResponse, error) {
+func (s *AllocationService) QuotaServiceResponse(nik, mid string) (dto.KuotaResponse, error) {
 	wallets, err := s.repo.CheckNikExists(nik)
 	if err != nil {
 		return dto.KuotaResponse{}, err
@@ -71,6 +73,66 @@ func (s *AllocationService) GetNikExistsResponse(nik, mid string) (dto.KuotaResp
 	return response, nil
 }
 
-func (s *AllocationService) InquiryServiceResponse(nik string, mid int) (dto.InquiryResponse, error) {
-	return dto.InquiryResponse{}, nil
+func (s *AllocationService) InquiryServiceResponse(nik, komoditas, mid, NamaPupuk string, KgBeli int) (dto.InquiryResponse, error) {
+
+	checkNik, err := s.repo.CheckNikExistsWallet(nik, komoditas)
+	if err != nil || checkNik.FarmerNIK == "" {
+		return dto.InquiryResponse{}, &NikNotFoundError{}
+	}
+
+	retailers, err := s.repo.GetRetailerByMidInquiry(mid)
+	if err != nil || len(retailers) == 0 {
+		return dto.InquiryResponse{}, &KiosNotMatchError{}
+	}
+
+	// retailer id
+	var retailerIDs []int
+	for _, r := range retailers {
+		retailerIDs = append(retailerIDs, r.ID)
+	}
+
+	alokasiPetani, err := s.repo.CheckAlokasiPetani(nik, komoditas, retailerIDs)
+
+	if err != nil {
+		return dto.InquiryResponse{}, err
+	}
+
+	if alokasiPetani == nil {
+		return dto.InquiryResponse{}, &AllocationNotFound{}
+	}
+
+	totalKuota := helpers.GetKuotaByPupuk(alokasiPetani, NamaPupuk)
+
+	if totalKuota == 0 || totalKuota < KgBeli {
+		return dto.InquiryResponse{}, &TidakMemilikiKuota{}
+	}
+
+	hargaMap := map[string]int{
+		"UREA":        50000,
+		"NPK":         60000,
+		"NPK_FORMULA": 65000,
+		"SP36":        40000,
+		"ZA":          35000,
+		"ORGANIC":     30000,
+		"POC":         25000,
+	}
+	harga := hargaMap[NamaPupuk]
+
+	kuotaSisa := totalKuota - KgBeli
+	totalBeli := harga * KgBeli
+
+	resp := dto.InquiryResponse{
+		NamaPetani:    alokasiPetani.FarmerName,
+		NamaKios:      alokasiPetani.RetailerName,
+		KelompokTani:  alokasiPetani.FarmerGroupName,
+		NamaPupuk:     NamaPupuk,
+		NamaKomoditas: komoditas,
+		KgBeli:        strconv.Itoa(KgBeli),
+		Harga:         strconv.Itoa(harga),
+		KuotaSisa:     strconv.Itoa(kuotaSisa),
+		KodeDesa:      alokasiPetani.SubDistrictCode,
+		TotalBeli:     strconv.Itoa(totalBeli),
+	}
+
+	return resp, nil
 }

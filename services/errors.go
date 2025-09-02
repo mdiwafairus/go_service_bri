@@ -15,3 +15,15 @@ type KiosNotMatchError struct {
 func (e *KiosNotMatchError) Error() string {
 	return "kios_not_match"
 }
+
+type AllocationNotFound struct{}
+
+func (e *AllocationNotFound) Error() string {
+	return "allocation_not_found"
+}
+
+type TidakMemilikiKuota struct{}
+
+func (e *TidakMemilikiKuota) Error() string {
+	return "tidak_memiliki_kuota"
+}

@@ -6,11 +6,14 @@ type NikExistsResponse struct {
 	FarmerGroupName string  `json:"farmer_group_name"`
 	RetailerMid     string  `json:"retailer_mid"`
 	RetailerName    string  `json:"retailer_name"`
+	SubDistrictCode string  `json:"sub_district_code"`
 	Urea            float64 `json:"urea"`
 	ZA              float64 `json:"za"`
 	SP36            float64 `json:"sp36"`
 	NPK             float64 `json:"npk"`
 	Organic         float64 `json:"organic"`
+	NpkFormula      float64 `json:"npk_formula"`
+	Poc             float64 `json:"poc"`
 }
 
 type KuotaPupuk struct {
@@ -38,14 +41,15 @@ type SuggestKios struct {
 }
 
 type InquiryResponse struct {
-	NamaPetani    string `json:"nama_petani"`
-	NamaKios      string `json:"nama_kios"`
-	KelompokTani  string `json:"kelompok_tani"`
-	NamaPupuk     string `json:"nama_pupuk"`
-	NamaKomoditas string `json:"nama_komoditas"`
-	KgBeli        string `json:"kg_beli"`
-	Harga         string `json:"harga"`
-	KuotaSisa     string `json:"kuota_sisa"`
-	KodeDesa      string `json:"kode_desa"`
-	TotalBeli     string `json:"total_beli"`
+	NamaPetani      string `json:"nama_petani"`
+	NamaKios        string `json:"nama_kios"`
+	KelompokTani    string `json:"kelompok_tani"`
+	NamaPupuk       string `json:"nama_pupuk"`
+	NamaKomoditas   string `json:"nama_komoditas"`
+	SubDistrictCode string `json:"sub_district_code"`
+	KgBeli          string `json:"kg_beli"`
+	Harga           string `json:"harga"`
+	KuotaSisa       string `json:"kuota_sisa"`
+	KodeDesa        string `json:"kode_desa"`
+	TotalBeli       string `json:"total_beli"`
 }

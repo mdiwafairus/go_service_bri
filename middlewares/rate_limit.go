@@ -9,7 +9,7 @@ import (
 
 func RateLimiter() fiber.Handler {
 	return limiter.New(limiter.Config{
-		Max:        5,               // max 10 req
+		Max:        10,              // max 10 req
 		Expiration: 1 * time.Minute, // reset setiap 1 menit
 
 		LimitReached: func(c *fiber.Ctx) error {

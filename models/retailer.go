@@ -3,6 +3,7 @@ package models
 import "time"
 
 type Retailer struct {
+	ID              int       `json:"id"`
 	Name            string    `json:"name"`
 	PihcCode        string    `json:"pihc_code"`
 	SubDistrictCode string    `json:"sub_district_code"`

@@ -3,6 +3,7 @@ package handlers
 import (
 	"go-fiber-api/constants"
 	"go-fiber-api/dto"
+	"go-fiber-api/helpers"
 	"go-fiber-api/services"
 
 	"github.com/gofiber/fiber/v2"
@@ -40,7 +41,7 @@ func QuotaHandler(service *services.AllocationService) fiber.Handler {
 			})
 		}
 
-		response, err := service.GetNikExistsResponse(req.Nik, req.Mid)
+		response, err := service.QuotaServiceResponse(req.Nik, req.Mid)
 		if err != nil {
 			switch e := err.(type) {
 			case *services.NikNotFoundError:
@@ -82,11 +83,44 @@ func InquiryHandler(service *services.AllocationService) fiber.Handler {
 			})
 		}
 
-		// if !helpers.KomoditasMap[komoditasParam] || !helpers.JenisPupukMap[namaPupuk] {
-		// 	return helpers.ResponseError(c, "33", "Jenis pupuk atau komoditi tidak valid")
-		// }
+		if !helpers.IsValidKomoditas(req.NamaKomoditas) || !helpers.IsValidPupuk(req.NamaPupuk) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusPupukKomoditasTidakValid,
+				"message": constants.MsgPupukKomoditasTidakValid,
+			})
+		}
 
-		response := "<response>"
+		response, err := service.InquiryServiceResponse(req.Nik, req.NamaKomoditas, req.Mid, req.NamaPupuk, req.KgBeli)
+		if err != nil {
+			switch err.(type) {
+			case *services.NikNotFoundError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusNikNotFound,
+					"message": constants.MsgNikNotFound,
+				})
+			case *services.KiosNotMatchError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusStandUnsuitable,
+					"message": constants.MsgStandUnsuitable,
+				})
+			case *services.AllocationNotFound:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusAlokasiNotFound,
+					"message": constants.MsgAlokasiNotFound,
+				})
+			case *services.TidakMemilikiKuota:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusTidakMemilikiKuota,
+					"message": constants.MsgTidakMemilikiKuota,
+				})
+			default:
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"code":    "500",
+					"message": err.Error(),
+				})
+			}
+		}
+
 		return c.JSON(fiber.Map{
 			"responseCode":    constants.StatusSuccess,
 			"responseMessage": constants.MsgSuccess,
