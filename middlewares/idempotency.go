@@ -2,35 +2,87 @@ package middlewares
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/redis/go-redis/v9"
+	"github.com/rs/zerolog/log"
 )
 
-func IdempotencyMiddleware(rdb *redis.Client, ctx context.Context) fiber.Handler {
+func makeRequestHash(c *fiber.Ctx) string {
+	raw := fmt.Sprintf("%s|%s|%s|%s",
+		c.Method(),
+		c.OriginalURL(),
+		string(c.Body()),
+		c.Get("Authorization"),
+	)
+	sum := sha256.Sum256([]byte(raw))
+	return hex.EncodeToString(sum[:])
+}
+
+func IdempotencyMiddleware(rdb *redis.Client, ctx context.Context, shortTTL, longTTL time.Duration) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		key := c.Get("Idempotency-Key")
-		if key == "" {
-			return fiber.NewError(fiber.StatusBadRequest, "Idempotency-Key required")
+		reqHash := makeRequestHash(c)
+
+		shortKey := "idem:short:" + reqHash
+		longKey := "idem:long:" + reqHash
+
+		// short TTL check double click
+		shortExists, _ := rdb.Exists(ctx, shortKey).Result()
+		if shortExists > 0 {
+			log.Warn().
+				Str("path", c.OriginalURL()).
+				Str("method", c.Method()).
+				Str("reqHash", reqHash).
+				Msg("Duplicate request blocked (double click)")
+			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+				"error": "Duplicate request detected (double click)",
+			})
 		}
 
-		val, err := rdb.Get(ctx, key).Result()
-		if err == nil && val != "" {
-			c.Set("X-Idempotency", "HIT")
-			return c.Status(fiber.StatusOK).SendString(val)
+		// long TTL (replay)
+		longExists, _ := rdb.Exists(ctx, longKey).Result()
+		if longExists > 0 {
+			log.Warn().
+				Str("path", c.OriginalURL()).
+				Str("method", c.Method()).
+				Str("reqHash", reqHash).
+				Msg("Duplicate request blocked (replay)")
+			return c.Status(fiber.StatusConflict).JSON(fiber.Map{
+				"error": "Duplicate request detected (replay)",
+			})
 		}
 
-		if err := c.Next(); err != nil {
-			return err
+		if err := rdb.Set(ctx, shortKey, 1, shortTTL).Err(); err != nil {
+			log.Error().
+				Err(err).
+				Str("reqHash", reqHash).
+				Msg("Failed to set short idempotency key")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "failed to set short idempotency key",
+			})
+		}
+		if err := rdb.Set(ctx, longKey, 1, longTTL).Err(); err != nil {
+			log.Error().
+				Err(err).
+				Str("reqHash", reqHash).
+				Msg("Failed to set long idempotency key")
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "failed to set long idempotency key",
+			})
 		}
 
-		body := string(c.Response().Body())
-		if body != "" {
-			_ = rdb.Set(ctx, key, body, 2*time.Minute).Err()
-		}
-		c.Set("X-Idempotency", "MISS")
+		log.Info().
+			Str("path", c.OriginalURL()).
+			Str("method", c.Method()).
+			Str("reqHash", reqHash).
+			Dur("shortTTL", shortTTL).
+			Dur("longTTL", longTTL).
+			Msg("First request stored in Redis (idempotency keys set)")
 
-		return nil
+		return c.Next()
 	}
 }

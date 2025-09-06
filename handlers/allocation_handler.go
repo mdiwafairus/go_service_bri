@@ -5,6 +5,7 @@ import (
 	"go-fiber-api/dto"
 	"go-fiber-api/helpers"
 	"go-fiber-api/services"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -73,6 +74,8 @@ func QuotaHandler(service *services.AllocationService) fiber.Handler {
 
 func InquiryHandler(service *services.AllocationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+
+		time.Sleep(2 * time.Second)
 
 		var req InquiryRequest
 

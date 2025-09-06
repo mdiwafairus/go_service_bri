@@ -20,7 +20,10 @@ func main() {
 	})
 
 	config.InitLogger()
+
+	// init redis, TTL
 	config.InitRedis()
+	config.InitTTL()
 
 	log.Info().Msg("Server started on port 3000")
 
