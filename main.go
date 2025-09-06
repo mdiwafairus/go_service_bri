@@ -20,9 +20,9 @@ func main() {
 	})
 
 	config.InitLogger()
+	config.InitRedis()
 
 	log.Info().Msg("Server started on port 3000")
-	log.Warn().Msg("This is a warning")
 
 	config.ConnectDB()
 

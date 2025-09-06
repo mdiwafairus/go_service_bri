@@ -27,3 +27,9 @@ type TidakMemilikiKuota struct{}
 func (e *TidakMemilikiKuota) Error() string {
 	return "tidak_memiliki_kuota"
 }
+
+type NikTidakValid struct{}
+
+func (e *NikTidakValid) Error() string {
+	return "nik_tidak_valid"
+}

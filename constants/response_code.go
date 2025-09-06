@@ -8,6 +8,7 @@ const (
 	StatusGeneralError             = "99"
 	StatusAlokasiNotFound          = "31"
 	StatusTidakMemilikiKuota       = "32"
+	StatusNikTidakValid            = "41"
 )
 
 const (
@@ -19,4 +20,5 @@ const (
 	MsgPupukKomoditasTidakValid = "Jenis pupuk atau komoditi tidak valid"
 	MsgAlokasiNotFound          = "Alokasi Tidak Ditemukan"
 	MsgTidakMemilikiKuota       = "Tidak memiliki kuota atau kuota tidak cukup"
+	MsgNikTidakValid            = "NIK tidak valid"
 )

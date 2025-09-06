@@ -1,9 +1,11 @@
 package helpers
 
 import (
+	"errors"
 	"go-fiber-api/dto"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"github.com/rs/zerolog/log"
 )
@@ -84,4 +86,16 @@ func GetKuotaByPupuk(wallet *dto.NikExistsResponse, pupuk string) int {
 	}
 
 	return total
+}
+
+func ValidateNIK(nik string) error {
+	if len(nik) != 16 {
+		return errors.New("NIK harus 16 digit")
+	}
+	for _, r := range nik {
+		if !unicode.IsDigit(r) {
+			return errors.New("NIK hanya boleh angka")
+		}
+	}
+	return nil
 }

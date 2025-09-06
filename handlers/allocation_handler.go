@@ -90,6 +90,13 @@ func InquiryHandler(service *services.AllocationService) fiber.Handler {
 			})
 		}
 
+		if req.KgBeli <= 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusTidakMemilikiKuota,
+				"message": constants.MsgTidakMemilikiKuota,
+			})
+		}
+
 		response, err := service.InquiryServiceResponse(req.Nik, req.NamaKomoditas, req.Mid, req.NamaPupuk, req.KgBeli)
 		if err != nil {
 			switch err.(type) {

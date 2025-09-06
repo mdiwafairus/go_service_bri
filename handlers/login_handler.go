@@ -21,7 +21,13 @@ func Login(c *fiber.Ctx) error {
 
 	if req.Username == "test" && req.Password == "123456" {
 		token, _ := middlewares.GenerateJWT(1)
-		return c.JSON(fiber.Map{"token": token})
+		return c.JSON(fiber.Map{
+			"user": fiber.Map{
+				"id":       1,
+				"username": req.Username,
+			},
+			"token": token,
+		})
 	}
 
 	return c.Status(401).JSON(fiber.Map{"error": "Invalid credentials"})
