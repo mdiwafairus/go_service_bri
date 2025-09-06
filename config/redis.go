@@ -33,5 +33,4 @@ func InitRedis() {
 	}
 
 	log.Error().Msg("failed to connect Redis after retries")
-	return
 }
