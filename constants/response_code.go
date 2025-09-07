@@ -10,6 +10,7 @@ const (
 	StatusTidakMemilikiKuota       = "32"
 	StatusNikTidakValid            = "41"
 	StatusPupukTidakValid          = "34"
+	StatusRefNumRupiahTidakValid   = "23"
 )
 
 const (
@@ -23,4 +24,5 @@ const (
 	MsgTidakMemilikiKuota       = "Tidak memiliki kuota atau kuota tidak cukup"
 	MsgNikTidakValid            = "NIK tidak valid"
 	MsgPupukTidakValid          = "Jenis pupuk tidak valid"
+	MsgRefNumRupiahTidakValid   = "ref num atau rupiah tidak valid"
 )

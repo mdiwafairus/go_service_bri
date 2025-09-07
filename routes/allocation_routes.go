@@ -13,7 +13,7 @@ import (
 func AllocationRoutes(app *fiber.App) {
 	v1 := app.Group("/api/v1")
 
-	allocation := v1.Group("/allocation", middlewares.JWTProtected(), middlewares.IdempotencyMiddleware(config.RedisCli, config.RedisCtx, config.ShortTTL, config.LongTTL))
+	allocation := v1.Group("/allocation", middlewares.JWTProtected())
 
 	allocationRepo := repositories.NewAllocationRepository(config.DB)
 	allocationService := services.NewAllocationService(allocationRepo)

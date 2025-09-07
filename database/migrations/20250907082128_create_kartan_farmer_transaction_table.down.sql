@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS kartan_farmer_transaction;

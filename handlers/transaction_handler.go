@@ -37,6 +37,20 @@ func TransactionHandler(service *services.TransactionService) fiber.Handler {
 			})
 		}
 
+		if req.KgBeli <= 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusTidakMemilikiKuota,
+				"message": constants.MsgTidakMemilikiKuota,
+			})
+		}
+
+		if req.RefNum <= 0 || req.TotalRupiah <= 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusRefNumRupiahTidakValid,
+				"message": constants.MsgRefNumRupiahTidakValid,
+			})
+		}
+
 		response, err := service.TransactionServiceResponse(req.Nik, req.Mid, req.NamaPupuk, req.NamaKomoditas, req.KgBeli, req.TotalRupiah, req.RefNum, req.TanggalTransaksi)
 		if err != nil {
 			switch err.(type) {

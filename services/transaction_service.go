@@ -20,6 +20,11 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 		return dto.TransactionResponse{}, &NikTidakValid{}
 	}
 
+	retailers, err := s.repo.GetRetailerByMidInquiry(mid)
+	if err != nil || len(retailers) == 0 {
+		return dto.TransactionResponse{}, &KiosNotMatchError{}
+	}
+
 	response := dto.TransactionResponse{
 		Mid:              mid,
 		Nik:              nik,
