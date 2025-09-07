@@ -5,6 +5,7 @@ import (
 	"go-fiber-api/helpers"
 	"go-fiber-api/repositories"
 	"strconv"
+	"strings"
 )
 
 type AllocationService struct {
@@ -106,17 +107,11 @@ func (s *AllocationService) InquiryServiceResponse(nik, komoditas, mid, NamaPupu
 	if totalKuota == 0 || totalKuota < KgBeli {
 		return dto.InquiryResponse{}, &TidakMemilikiKuota{}
 	}
-
-	hargaMap := map[string]int{
-		"UREA":        50000,
-		"NPK":         60000,
-		"NPK_FORMULA": 65000,
-		"SP36":        40000,
-		"ZA":          35000,
-		"ORGANIC":     30000,
-		"POC":         25000,
+	hargaPupuk, err := s.repo.GetHargaByNama(strings.ToUpper(NamaPupuk))
+	if err != nil || hargaPupuk.Harga <= 0 {
+		return dto.InquiryResponse{}, &PupukTidakValid{}
 	}
-	harga := hargaMap[NamaPupuk]
+	harga := hargaPupuk.Harga
 
 	kuotaSisa := totalKuota - KgBeli
 	totalBeli := harga * KgBeli

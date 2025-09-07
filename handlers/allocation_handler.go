@@ -123,6 +123,11 @@ func InquiryHandler(service *services.AllocationService) fiber.Handler {
 					"code":    constants.StatusTidakMemilikiKuota,
 					"message": constants.MsgTidakMemilikiKuota,
 				})
+			case *services.PupukTidakValid:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusPupukTidakValid,
+					"message": constants.MsgPupukTidakValid,
+				})
 			default:
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"code":    "500",

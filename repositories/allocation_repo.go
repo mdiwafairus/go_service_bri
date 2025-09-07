@@ -107,3 +107,10 @@ func (r *AllocationRepository) CheckAlokasiPetani(nik, komoditas string, retaile
 	}
 	return &wallet, nil
 }
+
+func (r *AllocationRepository) GetHargaByNama(namaPupuk string) (models.HargaPupuk, error) {
+	var harga models.HargaPupuk
+
+	result := r.db.Where("nama_pupuk = ? AND deleted_at IS NULL", namaPupuk).First(&harga)
+	return harga, result.Error
+}

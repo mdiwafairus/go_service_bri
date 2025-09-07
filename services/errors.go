@@ -33,3 +33,9 @@ type NikTidakValid struct{}
 func (e *NikTidakValid) Error() string {
 	return "nik_tidak_valid"
 }
+
+type PupukTidakValid struct{}
+
+func (e *PupukTidakValid) Error() string {
+	return "pupuk_tidak_valid"
+}
