@@ -11,6 +11,7 @@ const (
 	StatusNikTidakValid            = "41"
 	StatusPupukTidakValid          = "34"
 	StatusRefNumRupiahTidakValid   = "23"
+	StatusTransaksiDuplikat        = "45"
 )
 
 const (
@@ -25,4 +26,5 @@ const (
 	MsgNikTidakValid            = "NIK tidak valid"
 	MsgPupukTidakValid          = "Jenis pupuk tidak valid"
 	MsgRefNumRupiahTidakValid   = "ref num atau rupiah tidak valid"
+	MsgTransaksiDuplikat        = "Transaksi Duplikat"
 )

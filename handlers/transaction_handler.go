@@ -74,6 +74,11 @@ func TransactionHandler(service *services.TransactionService) fiber.Handler {
 					"code":    constants.StatusTidakMemilikiKuota,
 					"message": constants.MsgTidakMemilikiKuota,
 				})
+			case *services.DuplicateTransactionError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusTransaksiDuplikat,
+					"message": constants.MsgTransaksiDuplikat,
+				})
 			default:
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 					"code":    "500",

@@ -39,3 +39,9 @@ type PupukTidakValid struct{}
 func (e *PupukTidakValid) Error() string {
 	return "pupuk_tidak_valid"
 }
+
+type DuplicateTransactionError struct{}
+
+func (e *DuplicateTransactionError) Error() string {
+	return "transaksi_duplikat"
+}
