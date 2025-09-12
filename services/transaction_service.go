@@ -52,6 +52,10 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 
 	checkTransaksi, err := s.repo.CheckDuplicateTransaction(RefNum)
 
+	if err != nil {
+		return dto.TransactionResponse{}, err
+	}
+
 	if checkTransaksi != nil {
 		return dto.TransactionResponse{}, &DuplicateTransactionError{}
 	}
