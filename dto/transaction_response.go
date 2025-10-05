@@ -12,3 +12,9 @@ type TransactionResponse struct {
 	ClientId         int    `json:"client_id"`
 	TanggalTransaksi int    `json:"tanggal_transaksi"`
 }
+
+type ReversalTransactionResponse struct {
+	Nik    string `json:"nik"`
+	Mid    string `json:"mid"`
+	RefNum int    `json:"refnum"`
+}

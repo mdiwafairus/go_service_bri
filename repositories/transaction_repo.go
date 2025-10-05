@@ -27,13 +27,16 @@ func (r *TransactionRepository) GetRetailerByMidInquiry(mid string) ([]models.Re
 	return retailers, nil
 }
 
-func (r *TransactionRepository) CheckAlokasiPetaniTransaction(nik, komoditas string, retailerID []int) (*models.PspWallet, error) {
-	var wallet models.PspWallet
-	err := r.db.Where("farmer_nik = ? AND komoditas = ? AND retailer_id IN ? AND is_active = 1", nik, komoditas, retailerID).First(&wallet).Error
+func (r *TransactionRepository) CheckAlokasiPetaniTransaction(nik, komoditas string, retailerID []int) ([]models.PspWallet, error) {
+	var wallet []models.PspWallet
+	err := r.db.Where("farmer_nik = ? AND komoditas = ? AND retailer_id IN ? AND is_active = 1", nik, komoditas, retailerID).
+		Order("urea + npk + npk_formula + sp36 + za + organic + poc DESC").
+		Find(&wallet).Error
+
 	if err != nil {
 		return nil, err
 	}
-	return &wallet, nil
+	return wallet, nil
 }
 
 func (r *TransactionRepository) CheckDuplicateTransaction(refnum int) (*models.KartanFarmerTransaction, error) {

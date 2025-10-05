@@ -56,6 +56,7 @@ func main() {
 
 	routes.UserRoutes(app)
 	routes.AllocationRoutes(app)
+	routes.TransactionRoutes(app)
 
 	err := app.Listen(":3000")
 	if err != nil {

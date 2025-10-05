@@ -53,3 +53,23 @@ type InquiryResponse struct {
 	KodeDesa        string `json:"kode_desa"`
 	TotalBeli       string `json:"total_beli"`
 }
+
+func (n *NikExistsResponse) GetUrea() int       { return int(n.Urea) }
+func (n *NikExistsResponse) GetZa() int         { return int(n.ZA) }
+func (n *NikExistsResponse) GetSp36() int       { return int(n.SP36) }
+func (n *NikExistsResponse) GetNpk() int        { return int(n.NPK) }
+func (n *NikExistsResponse) GetOrganic() int    { return int(n.Organic) }
+func (n *NikExistsResponse) GetNpkFormula() int { return int(n.NpkFormula) }
+func (n *NikExistsResponse) GetPoc() int        { return int(n.Poc) }
+
+func (n *NikExistsResponse) ToMap() map[string]int {
+	return map[string]int{
+		"UREA":        int(n.Urea),
+		"ZA":          int(n.ZA),
+		"SP36":        int(n.SP36),
+		"NPK":         int(n.NPK),
+		"ORGANIC":     int(n.Organic),
+		"NPK_FORMULA": int(n.NpkFormula),
+		"POC":         int(n.Poc),
+	}
+}

@@ -18,5 +18,6 @@ func TransactionRoutes(app *fiber.App) {
 	transactionRepo := repositories.NewTransactionRepository(config.DB)
 	transactionService := services.NewTransactionService(transactionRepo)
 
-	transaction.Get("/purchase", handlers.TransactionHandler(transactionService))
+	transaction.Post("/purchase", handlers.TransactionHandler(transactionService))
+	transaction.Post("/reversal", handlers.ReversalTransactionHandler(transactionService))
 }

@@ -19,6 +19,12 @@ type TransactionRequest struct {
 	TanggalTransaksi int    `json:"tanggal_transaksi"`
 }
 
+type ReversalTransactionRequest struct {
+	Nik    string `json:"nik"`
+	Mid    string `json:"mid"`
+	RefNum int    `json:"refnum"`
+}
+
 func TransactionHandler(service *services.TransactionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req TransactionRequest
@@ -87,6 +93,61 @@ func TransactionHandler(service *services.TransactionService) fiber.Handler {
 			}
 		}
 
+		return c.JSON(fiber.Map{
+			"responseCode":    constants.StatusSuccess,
+			"responseMessage": constants.MsgSuccess,
+			"data":            response,
+		})
+	}
+}
+
+func ReversalTransactionHandler(service *services.TransactionService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req ReversalTransactionRequest
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    "400",
+				"message": "Invalid request body",
+			})
+		}
+
+		if err := helpers.ValidateNIK(req.Nik); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusNikTidakValid,
+				"message": constants.MsgNikTidakValid,
+			})
+		}
+		if req.RefNum <= 0 {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"code":    constants.StatusRefNumRupiahTidakValid,
+				"message": constants.MsgRefNumRupiahTidakValid,
+			})
+		}
+		response, err := service.ReversalTransactionService(req.Nik, req.Mid, req.RefNum)
+		if err != nil {
+			switch err.(type) {
+			case *services.NikNotFoundError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusNikNotFound,
+					"message": constants.MsgNikNotFound,
+				})
+			case *services.KiosNotMatchError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusStandUnsuitable,
+					"message": constants.MsgStandUnsuitable,
+				})
+			case *services.DuplicateTransactionError:
+				return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+					"code":    constants.StatusTransaksiDuplikat,
+					"message": constants.MsgTransaksiDuplikat,
+				})
+			default:
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+					"code":    "500",
+					"message": err.Error(),
+				})
+			}
+		}
 		return c.JSON(fiber.Map{
 			"responseCode":    constants.StatusSuccess,
 			"responseMessage": constants.MsgSuccess,

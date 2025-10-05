@@ -18,6 +18,16 @@ func NewTransactionService(repo *repositories.TransactionRepository) *Transactio
 	return &TransactionService{repo: repo}
 }
 
+func buildTransactionData(wallet models.PspWallet, request dto.TransactionResponse, refCode string, usedQuota int) map[string]interface{} {
+	return map[string]interface{}{
+		"wallet_id":  wallet.IdWallet,
+		"nik":        request.Nik,
+		"komoditas":  request.NamaKomoditas,
+		"ref_code":   refCode,
+		"used_quota": usedQuota,
+	}
+}
+
 func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, NamaKomoditas string, KgBeli, TotalRupiah, RefNum, TanggalTransaksi int) (dto.TransactionResponse, error) {
 
 	if err := helpers.ValidateNIK(nik); err != nil {
@@ -40,13 +50,13 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 		}
 	}()
 
-	checkAlokasi, err := s.repo.CheckAlokasiPetaniTransaction(nik, NamaKomoditas, []int{retailers[0].ID})
+	checkWallet, err := s.repo.CheckAlokasiPetaniTransaction(nik, NamaKomoditas, []int{retailers[0].ID})
 
 	if err != nil {
 		return dto.TransactionResponse{}, err
 	}
 
-	if checkAlokasi == nil {
+	if checkWallet == nil {
 		return dto.TransactionResponse{}, &AllocationNotFound{}
 	}
 
@@ -60,6 +70,25 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 		return dto.TransactionResponse{}, &DuplicateTransactionError{}
 	}
 
+	remainingKg := KgBeli
+
+	var totalAvailableQuota int
+	for _, wallet := range checkWallet {
+		quotaMap := map[string]int{
+			"UREA":        int(wallet.Urea),
+			"NPK":         int(wallet.Npk),
+			"NPK_FORMULA": int(wallet.NpkFormula),
+			"SP36":        int(wallet.Sp36),
+			"ZA":          int(wallet.Za),
+			"ORGANIC":     int(wallet.Organic),
+			"POC":         int(wallet.Poc),
+		}
+		totalAvailableQuota += quotaMap[NamaPupuk]
+	}
+
+	if totalAvailableQuota < remainingKg {
+		return dto.TransactionResponse{}, &TidakMemilikiKuota{}
+	}
 	refCode := utils.GenerateRefCode(
 		nik,
 		mid,
@@ -71,6 +100,30 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 	)
 
 	fmt.Println("Reference Code:", refCode)
+
+	listAllocationUsed := []map[string]interface{}{}
+	listTransaction := []map[string]interface{}{}
+
+	for _, wallet := range checkWallet {
+
+		currentQuota := 30
+		// currentQuota := helpers.GetKuotaByPupuk(wallet, NamaPupuk)
+
+		usedQuota := min(remainingKg, currentQuota)
+
+		listAllocationUsed = append(listAllocationUsed, map[string]interface{}{
+			"update": map[string]interface{}{"id": wallet.IdWallet},
+			"data":   map[string]interface{}{NamaPupuk: currentQuota - usedQuota},
+		})
+
+		listTransaction = append(listTransaction, buildTransactionData(wallet, dto.TransactionResponse{}, NamaKomoditas, usedQuota))
+
+		remainingKg -= usedQuota
+
+		if remainingKg <= 0 {
+			break
+		}
+	}
 
 	newTrx := models.KartanFarmerTransaction{
 		SubdistrictCode:   "1234567890",
@@ -132,5 +185,16 @@ func (s *TransactionService) TransactionServiceResponse(nik, mid, NamaPupuk, Nam
 		ClientId:         1,
 		TanggalTransaksi: 20230101,
 	}
+	return response, nil
+}
+
+func (s *TransactionService) ReversalTransactionService(nik, mid string, refnum int) (dto.ReversalTransactionResponse, error) {
+
+	response := dto.ReversalTransactionResponse{
+		Nik:    "1233",
+		Mid:    "98777",
+		RefNum: 123,
+	}
+
 	return response, nil
 }
